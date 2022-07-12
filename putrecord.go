@@ -4,26 +4,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-
+	"bytes"
+	"github.com/aucfan-yotsuya/gomod/common"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/firehose"
-	"github.com/aucfan-yotsuya/gomod/common"
-	"bytes"
 )
-type FakeEntity struct {
-	Name      string `json:"name"`
-	Age       int    `json:"age"`
-	CreatedAt string `json:"created_at"`
+
+type Data struct {
+	Ymd        string `json:"ymd"`
+	UserId     int    `json:"user_id"`
+	Disfa      string `json:"disfa"`
+	Fqdn       string `json:"fqdn"`
+	Path       string `json:"path"`
+	QueryParam string `json:"queryparam"`
+	CreatedAt  string `json:"created_at"`
 }
 
-const maxUint = 4294967295
+const maxUint = 100000000
 
 func PutRecord() {
 	streamName := "isoda-test-stream"
 
 	var layout = "2006-01-02 15:04:05"
+	var layout2 = "20060102"
 	fmt.Println(common.NowJST().Format(layout))
 
 	// Assume Roleを使用する
@@ -33,10 +38,14 @@ func PutRecord() {
 
 	// Put Recoad
 	for i := 0; i < 100; i++ {
-		data := FakeEntity{
-			Name:      fmt.Sprintf("%d", rand.Intn(maxUint)),
-			Age:       20,
-			CreatedAt: common.NowJST().Format(layout),
+		data := Data{
+			Ymd:        common.NowJST().Format(layout2),
+			UserId:     rand.Intn(maxUint),
+			Disfa:      "97d0a27afdafcacc1e346c69fbca65aa",
+			Fqdn:       "pro.aucfan.com",
+			Path:       "/home",
+			QueryParam: "",
+			CreatedAt:  common.NowJST().Format(layout),
 		}
 
 		b := new(bytes.Buffer)
@@ -56,10 +65,14 @@ func PutRecord() {
 	records := []*firehose.Record{}
 
 	for i := 0; i < 100; i++ {
-		data := FakeEntity{
-			Name:      fmt.Sprintf("%d", rand.Intn(maxUint)),
-			Age:       20,
-			CreatedAt: common.NowJST().Format(layout),
+		data := Data{
+			Ymd:        common.NowJST().Format(layout2),
+			UserId:     rand.Intn(maxUint),
+			Disfa:      "97d0a27afdafcacc1e346c69fbca65aa",
+			Fqdn:       "pro.aucfan.com",
+			Path:       "/home",
+			QueryParam: "",
+			CreatedAt:  common.NowJST().Format(layout),
 		}
 
 		// b, err := json.Marshal(data)
