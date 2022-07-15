@@ -24,8 +24,9 @@ type Data struct {
 
 const maxUint = 100000000
 
-func PutRecord() {
-	streamName := "isoda-test-stream"
+func main() {
+	streamName := "test-isoda-dynamic"
+	// streamName := "KDS-S3-ib5f9"
 
 	var layout = "2006-01-02 15:04:05"
 	var layout2 = "20060102"

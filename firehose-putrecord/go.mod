@@ -1,4 +1,4 @@
-module u
+module p
 
 go 1.16
 
