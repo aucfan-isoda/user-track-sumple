@@ -10,10 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
-	
 	"github.com/aws/aws-sdk-go/service/s3"
-	
-	"os"
 	"strconv"
 	"time"
 )
@@ -31,7 +28,8 @@ type Data struct {
 
 func main() {
 
-	const day = "20210702"
+	const day = "20211203"
+	const dst_key = "date/2021/12/03/a.gz"
 
 	var (
 		d       *db.DB
@@ -53,7 +51,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	records, err = d.GetTarget(0).Select(ctx, fmt.Sprintf("select * from user_track where ymd = %s;", day))
-	
+
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -93,7 +91,7 @@ func main() {
 
 	var buffer bytes.Buffer
 	writer := gzip.NewWriter(&buffer)
-	
+
 	if _, err := writer.Write(buf.Bytes()); err != nil {
 		fmt.Println(err)
 	}
@@ -109,52 +107,10 @@ func main() {
 	}))
 
 	_, err = s3.New(sess).PutObject(&s3.PutObjectInput{
-		Bucket: aws.String("isoda-test-firehose"),
-		Key:    aws.String("date/2021/07/02/a.gz"),
+		Bucket:          aws.String("isoda-test-firehose"),
+		Key:             aws.String(dst_key),
 		Body:            bytes.NewReader(buffer.Bytes()),
 		ContentType:     aws.String("application/octet-stream"),
 		ContentEncoding: aws.String("gzip"),
 	})
-
-}
-
-func Upload() {
-	sess := session.Must(session.NewSession())
-
-	creds := stscreds.NewCredentials(sess, "arn:aws:iam::337081975962:role/AucfanDevMasterRole")
-
-	sess = (session.New(&aws.Config{
-		Region:      aws.String("ap-northeast-1"),
-		Credentials: creds,
-	}))
-
-	file, err := os.Open("./hoge.gz")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-
-	upFileInfo, err := file.Stat()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	var fileSize int64 = upFileInfo.Size()
-	fileBuffer := make([]byte, fileSize)
-	file.Read(fileBuffer)
-
-	_, err = s3.New(sess).PutObject(&s3.PutObjectInput{
-		Bucket: aws.String("isoda-test-firehose"),
-		Key:    aws.String("test/hoge7.gz"),
-		
-		
-		Body:            bytes.NewReader(fileBuffer),
-		ContentLength:   aws.Int64(fileSize),
-		ContentType:     aws.String("application/x-gzip"),
-		ContentEncoding: aws.String("gzip"),
-		
-		
-	})
-
-	fmt.Println("Done")
 }

@@ -1,15 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"math/rand"
-	"bytes"
 	"github.com/aucfan-yotsuya/gomod/common"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/firehose"
+	"math/rand"
 )
 
 type Data struct {
@@ -45,7 +45,7 @@ func main() {
 			Disfa:      "97d0a27afdafcacc1e346c69fbca65aa",
 			Fqdn:       "pro.aucfan.com",
 			Path:       "/home",
-			QueryParam: "",
+			QueryParam: "q=Alexander+McQueen%E3%80%80%E3%80%80%E3%83%96%E3%83%BC%E3%83%84%E3%80%80%E3%82%B5%E3%82%A4%E3%83%89%E3%82%B4%E3%82%A2&search=&q=Alexander+McQueen%E3%80%80%E3%80%80%E3%83%96%E3%83%BC%E3%83%84%E3%80%80%E3%82%B5%E3%82%A4%E3%83%89%E3%82%B4%E3%82%A2&exq=&selle",
 			CreatedAt:  common.NowJST().Format(layout),
 		}
 
@@ -61,34 +61,34 @@ func main() {
 	}
 
 	// Put Record Batch
-	recordsBatchInput := &firehose.PutRecordBatchInput{}
-	recordsBatchInput = recordsBatchInput.SetDeliveryStreamName(streamName)
-	records := []*firehose.Record{}
+	// recordsBatchInput := &firehose.PutRecordBatchInput{}
+	// recordsBatchInput = recordsBatchInput.SetDeliveryStreamName(streamName)
+	// records := []*firehose.Record{}
 
-	for i := 0; i < 100; i++ {
-		data := Data{
-			Ymd:        common.NowJST().Format(layout2),
-			UserId:     rand.Intn(maxUint),
-			Disfa:      "97d0a27afdafcacc1e346c69fbca65aa",
-			Fqdn:       "pro.aucfan.com",
-			Path:       "/home",
-			QueryParam: "",
-			CreatedAt:  common.NowJST().Format(layout),
-		}
+	// for i := 0; i < 100; i++ {
+	// 	data := Data{
+	// 		Ymd:        common.NowJST().Format(layout2),
+	// 		UserId:     rand.Intn(maxUint),
+	// 		Disfa:      "97d0a27afdafcacc1e346c69fbca65aa",
+	// 		Fqdn:       "pro.aucfan.com",
+	// 		Path:       "/home",
+	// 		QueryParam: "",
+	// 		CreatedAt:  common.NowJST().Format(layout),
+	// 	}
 
-		// b, err := json.Marshal(data)
-		b := new(bytes.Buffer)
-		json.NewEncoder(b).Encode(data)
+	// 	// b, err := json.Marshal(data)
+	// 	b := new(bytes.Buffer)
+	// 	json.NewEncoder(b).Encode(data)
 
-		record := &firehose.Record{Data: b.Bytes()}
-		records = append(records, record)
+	// 	record := &firehose.Record{Data: b.Bytes()}
+	// 	records = append(records, record)
 
-	}
-	recordsBatchInput = recordsBatchInput.SetRecords(records)
-	resp, err := firehoseService.PutRecordBatch(recordsBatchInput)
-	if err != nil {
-		fmt.Printf("PutRecordBatch err: %v\n", err)
-	} else {
-		fmt.Printf("PutRecordBatch: %v\n", resp)
-	}
+	// }
+	// recordsBatchInput = recordsBatchInput.SetRecords(records)
+	// resp, err := firehoseService.PutRecordBatch(recordsBatchInput)
+	// if err != nil {
+	// 	fmt.Printf("PutRecordBatch err: %v\n", err)
+	// } else {
+	// 	fmt.Printf("PutRecordBatch: %v\n", resp)
+	// }
 }
